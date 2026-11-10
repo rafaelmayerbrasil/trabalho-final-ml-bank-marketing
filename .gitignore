@@ -1,0 +1,20 @@
+# Arquivos locais que não fazem parte do projeto
+.claude/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# Pacote de entrega do portal (gerado a partir destes arquivos)
+*.zip
+
+# HTML intermediário do relatório (o PDF é a versão final)
+relatorio/_relatorio.html
+
+# Notebook de outra tarefa da disciplina, guardado só como referência
+tarefa_3_classificacao_diabetes.ipynb
+
+# Scripts auxiliares usados para gerar notebook, relatório e prints (não fazem parte da entrega)
+_scripts_claude/
+
+# Enunciado da disciplina (material do curso, não publicar)
+Trabalho Final - Aplica*.txt

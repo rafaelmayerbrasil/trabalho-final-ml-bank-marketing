@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Propensão a Depósito a Prazo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%23244357%22/%3E%3Cpath d=%22M7 23l6-7 5 4 7-10%22 stroke=%22%23F2A53D%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E">
+<style>
+  :root {
+    --azul: #244357; --azul-2: #2f5a74; --teal: #23A8C3; --laranja: #F2A53D; --vermelho: #C0504D;
+    --verde: #2E8B57; --fundo: #F4F6F8; --cartao: #FFFFFF; --borda: #DDE3E8; --texto: #1E2A33;
+    --suave: #5E6E7A; --erro-fundo: #FDECEC; --ok-fundo: #EAF6EF;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+         background: var(--fundo); color: var(--texto); font-size: 15px; }
+  header { background: var(--azul); color: #fff; padding: 18px 28px; display: flex;
+           align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: .2px; }
+  header p { margin: 3px 0 0; font-size: 13px; opacity: .8; }
+  .selo { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25);
+          border-radius: 999px; padding: 6px 14px; font-size: 12.5px; white-space: nowrap; }
+  .selo b { color: var(--laranja); }
+  main { max-width: 1180px; margin: 24px auto; padding: 0 20px; display: grid;
+         grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .cartao { background: var(--cartao); border: 1px solid var(--borda); border-radius: 12px;
+            padding: 20px 22px; box-shadow: 0 1px 2px rgba(20,40,60,.05); }
+  h2 { margin: 0 0 4px; font-size: 16px; color: var(--azul); }
+  .sub { margin: 0 0 16px; color: var(--suave); font-size: 13px; }
+  fieldset { border: none; padding: 0; margin: 0 0 16px; }
+  legend { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px;
+           color: var(--teal); margin-bottom: 10px; padding: 0; }
+  .grade { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 14px; }
+  .campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .campo label { font-size: 12.5px; font-weight: 600; color: var(--texto); }
+  .campo small { font-size: 11px; color: var(--suave); }
+  input, select { width: 100%; padding: 8px 10px; border: 1px solid var(--borda); border-radius: 8px;
+                  font: inherit; font-size: 14px; background: #fff; color: var(--texto); }
+  input:focus, select:focus { outline: 2px solid var(--teal); outline-offset: 0; border-color: var(--teal); }
+  .campo.invalido input, .campo.invalido select { border-color: var(--vermelho); background: var(--erro-fundo); }
+  .msg-campo { color: var(--vermelho); font-size: 11.5px; min-height: 0; }
+  .acoes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+  button { font: inherit; font-size: 14px; border-radius: 8px; padding: 10px 16px; cursor: pointer;
+           border: 1px solid var(--borda); background: #fff; color: var(--azul); }
+  button.primario { background: var(--azul); border-color: var(--azul); color: #fff; font-weight: 600; padding: 10px 22px; }
+  button.primario:hover { background: var(--azul-2); }
+  button:disabled { opacity: .6; cursor: wait; }
+  .alerta { display: none; border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; font-size: 13.5px; }
+  .alerta.erro { display: block; background: var(--erro-fundo); border: 1px solid #F1B9B7; color: #8A2724; }
+  .alerta ul { margin: 6px 0 0; padding-left: 18px; }
+  /* resultado */
+  .vazio { text-align: center; color: var(--suave); padding: 26px 8px; font-size: 13.5px; }
+  .vazio .icone { font-size: 34px; color: var(--borda); margin-bottom: 6px; }
+  .resultado { display: none; }
+  .badge { display: inline-block; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700; }
+  .badge.alta { background: var(--ok-fundo); color: var(--verde); border: 1px solid #BFE3CD; }
+  .badge.baixa { background: #EEF1F4; color: var(--suave); border: 1px solid var(--borda); }
+  .prob { font-size: 52px; font-weight: 700; color: var(--azul); line-height: 1.05; margin: 12px 0 2px; }
+  .prob span { font-size: 20px; font-weight: 600; color: var(--suave); }
+  .legenda-prob { color: var(--suave); font-size: 13px; margin-bottom: 18px; }
+  .medidor { position: relative; height: 14px; border-radius: 999px; background: #E7ECF0; margin: 26px 0 30px; }
+  .medidor .preench { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: var(--teal); transition: width .5s; }
+  .marca { position: absolute; top: -7px; bottom: -7px; width: 2px; }
+  .marca i { position: absolute; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 10.5px; white-space: nowrap; }
+  .marca.limiar { background: var(--vermelho); } .marca.limiar i { top: -16px; color: var(--vermelho); font-weight: 700; }
+  .marca.base { background: var(--suave); } .marca.base i { bottom: -17px; color: var(--suave); }
+  .recomendacao { border-left: 4px solid var(--teal); background: #F2FAFC; padding: 10px 12px; border-radius: 6px; font-size: 14px; }
+  .recomendacao.alta { border-color: var(--verde); background: var(--ok-fundo); }
+  .detalhes { margin-top: 14px; font-size: 12.5px; color: var(--suave); line-height: 1.55; }
+  .modelo-info { margin-top: 18px; }
+  .metricas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+  .metrica { background: var(--fundo); border-radius: 8px; padding: 8px; text-align: center; }
+  .metrica b { display: block; font-size: 17px; color: var(--azul); }
+  .metrica span { font-size: 11px; color: var(--suave); }
+  .nota { font-size: 11.5px; color: var(--suave); margin-top: 10px; line-height: 1.5; }
+  footer { text-align: center; color: var(--suave); font-size: 12px; padding: 8px 20px 26px; }
+  @media (max-width: 980px) { main { grid-template-columns: 1fr; } .grade { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .grade { grid-template-columns: 1fr; } header { padding: 16px; } main { padding: 0 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Propensão a Depósito a Prazo</h1>
+    <p>Priorização de ligações em campanhas de telemarketing bancário · Trabalho Final de Machine Learning (PUC Minas)</p>
+  </div>
+  <div class="selo" id="status-api">Conectando ao modelo…</div>
+</header>
+
+<main>
+  <section class="cartao">
+    <h2>Dados do cliente</h2>
+    <p class="sub">Preencha as informações conhecidas <b>antes</b> da ligação e clique em “Calcular propensão”.</p>
+
+    <div class="alerta" id="alerta" role="alert"></div>
+
+    <form id="form" novalidate autocomplete="off">
+      <fieldset>
+        <legend>Perfil</legend>
+        <div class="grade">
+          <div class="campo" data-campo="age"><label for="age">Idade (anos)</label><input id="age" name="age" inputmode="numeric" placeholder="ex.: 40"><small>18 a 100</small><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="job"><label for="job">Profissão</label><select id="job" name="job"></select><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="marital"><label for="marital">Estado civil</label><select id="marital" name="marital"></select><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="education"><label for="education">Escolaridade</label><select id="education" name="education"></select><div class="msg-campo"></div></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Situação financeira</legend>
+        <div class="grade">
+          <div class="campo" data-campo="balance"><label for="balance">Saldo médio anual (€)</label><input id="balance" name="balance" inputmode="decimal" placeholder="ex.: 1200"><small>pode ser negativo</small><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="default"><label for="default">Crédito em atraso?</label><select id="default" name="default"></select><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="housing"><label for="housing">Financ. imobiliário?</label><select id="housing" name="housing"></select><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="loan"><label for="loan">Empréstimo pessoal?</label><select id="loan" name="loan"></select><div class="msg-campo"></div></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Campanha atual</legend>
+        <div class="grade">
+          <div class="campo" data-campo="contact"><label for="contact">Meio de contato</label><select id="contact" name="contact"></select><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="month"><label for="month">Mês do contato</label><select id="month" name="month"></select><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="day"><label for="day">Dia do contato</label><input id="day" name="day" inputmode="numeric" placeholder="1 a 31"><small>dia do mês</small><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="campaign"><label for="campaign">Contatos nesta campanha</label><input id="campaign" name="campaign" inputmode="numeric" placeholder="ex.: 1"><small>incluindo este</small><div class="msg-campo"></div></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Histórico de campanhas anteriores</legend>
+        <div class="grade">
+          <div class="campo" data-campo="previous"><label for="previous">Contatos anteriores</label><input id="previous" name="previous" inputmode="numeric" placeholder="0 se nunca"><small>antes desta campanha</small><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="pdays"><label for="pdays">Dias desde último contato</label><input id="pdays" name="pdays" inputmode="numeric" placeholder="-1 se nunca"><small>-1 = nunca contatado</small><div class="msg-campo"></div></div>
+          <div class="campo" data-campo="poutcome" style="grid-column: span 2"><label for="poutcome">Resultado da campanha anterior</label><select id="poutcome" name="poutcome"></select><div class="msg-campo"></div></div>
+        </div>
+      </fieldset>
+
+      <div class="acoes">
+        <button type="submit" class="primario" id="btn-prever">Calcular propensão</button>
+        <button type="button" data-exemplo="alto">Exemplo promissor</button>
+        <button type="button" data-exemplo="baixo">Exemplo pouco provável</button>
+        <button type="button" id="btn-limpar">Limpar</button>
+      </div>
+    </form>
+  </section>
+
+  <aside>
+    <section class="cartao">
+      <h2>Resultado</h2>
+      <div class="vazio" id="vazio"><div class="icone">◔</div>Nenhuma previsão ainda.<br>Preencha o formulário ou use um dos exemplos.</div>
+      <div class="resultado" id="resultado">
+        <span class="badge" id="badge"></span>
+        <div class="prob" id="prob"></div>
+        <div class="legenda-prob" id="legenda-prob"></div>
+        <div class="medidor">
+          <div class="preench" id="preench"></div>
+          <div class="marca base" id="marca-base"><i id="txt-base"></i></div>
+          <div class="marca limiar" id="marca-limiar"><i id="txt-limiar"></i></div>
+        </div>
+        <div class="recomendacao" id="recomendacao"></div>
+        <div class="detalhes" id="detalhes"></div>
+      </div>
+    </section>
+
+    <section class="cartao modelo-info">
+      <h2>Sobre o modelo</h2>
+      <p class="sub" style="margin-bottom:4px" id="modelo-nome">XGBoost com probabilidades calibradas, treinado com 36.168 contatos (UCI Bank Marketing).</p>
+      <div class="metricas" id="metricas"></div>
+      <p class="nota">Métricas no conjunto de teste (9.043 clientes que o modelo nunca viu). As probabilidades são <b>calibradas</b>: quando o modelo diz 50%, cerca de metade desses clientes contrata. A duração da ligação foi excluída porque só é conhecida depois do contato. O resultado serve para <b>priorizar</b> a fila, não é garantia de venda.</p>
+    </section>
+  </aside>
+</main>
+<footer>Rafael Brasil · Pós-graduação em IA Generativa e Aplicações com LLMs · PUC Minas · 2026</footer>
+
+<script>
+// Rótulos em português para as categorias do dataset (os valores enviados à API ficam em inglês)
+const TRADUCAO = {
+  job: { 'admin.': 'Administrativo', 'blue-collar': 'Operário', 'entrepreneur': 'Empreendedor', 'housemaid': 'Doméstica',
+         'management': 'Gestão', 'retired': 'Aposentado', 'self-employed': 'Autônomo', 'services': 'Serviços',
+         'student': 'Estudante', 'technician': 'Técnico', 'unemployed': 'Desempregado', 'unknown': 'Não informado' },
+  marital: { 'married': 'Casado(a)', 'single': 'Solteiro(a)', 'divorced': 'Divorciado(a) / viúvo(a)' },
+  education: { 'primary': 'Fundamental', 'secondary': 'Médio', 'tertiary': 'Superior', 'unknown': 'Não informado' },
+  default: { 'no': 'Não', 'yes': 'Sim' }, housing: { 'no': 'Não', 'yes': 'Sim' }, loan: { 'no': 'Não', 'yes': 'Sim' },
+  contact: { 'cellular': 'Celular', 'telephone': 'Telefone fixo', 'unknown': 'Não registrado' },
+  month: { 'jan': 'Janeiro', 'feb': 'Fevereiro', 'mar': 'Março', 'apr': 'Abril', 'may': 'Maio', 'jun': 'Junho',
+           'jul': 'Julho', 'aug': 'Agosto', 'sep': 'Setembro', 'oct': 'Outubro', 'nov': 'Novembro', 'dec': 'Dezembro' },
+  poutcome: { 'success': 'Sucesso (contratou)', 'failure': 'Fracasso (recusou)', 'other': 'Outro', 'unknown': 'Desconhecido / sem campanha anterior' },
+};
+const ORDEM_MESES = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+const NUMERICOS = { age: 'int', balance: 'float', day: 'int', campaign: 'int', pdays: 'int', previous: 'int' };
+const ROTULOS = { age: 'Idade', balance: 'Saldo médio anual', day: 'Dia do contato', campaign: 'Contatos nesta campanha',
+                  pdays: 'Dias desde o último contato', previous: 'Contatos anteriores', job: 'Profissão', marital: 'Estado civil',
+                  education: 'Escolaridade', default: 'Crédito em atraso', housing: 'Financiamento imobiliário',
+                  loan: 'Empréstimo pessoal', contact: 'Meio de contato', month: 'Mês do contato', poutcome: 'Resultado da campanha anterior' };
+const EXEMPLOS = {
+  alto: { age: 63, job: 'retired', marital: 'married', education: 'secondary', balance: 4200, default: 'no', housing: 'no', loan: 'no',
+          contact: 'cellular', month: 'oct', day: 14, campaign: 1, previous: 2, pdays: 182, poutcome: 'success' },
+  baixo: { age: 38, job: 'blue-collar', marital: 'married', education: 'primary', balance: 150, default: 'no', housing: 'yes', loan: 'yes',
+           contact: 'unknown', month: 'may', day: 20, campaign: 4, previous: 0, pdays: -1, poutcome: 'unknown' },
+};
+let META = null;
+const $ = (id) => document.getElementById(id);
+const pct = (v, casas = 1) => (v * 100).toFixed(casas).replace('.', ',') + '%';
+
+async function iniciar() {
+  try {
+    const r = await fetch('/api/metadados');
+    if (!r.ok) throw new Error();
+    META = await r.json();
+  } catch {
+    $('status-api').innerHTML = '⚠ API indisponível';
+    mostrarErros(['Não foi possível conectar à API. Verifique se o servidor está rodando (uvicorn app.app:app) e recarregue a página.']);
+    return;
+  }
+  for (const [campo, valores] of Object.entries(META.categorias)) {
+    const sel = $(campo);
+    const lista = campo === 'month' ? ORDEM_MESES.filter(m => valores.includes(m)) : valores;
+    sel.innerHTML = '<option value="">Selecione…</option>' +
+      lista.map(v => `<option value="${v}">${(TRADUCAO[campo] || {})[v] || v}</option>`).join('');
+  }
+  $('status-api').innerHTML = `Modelo carregado · limiar <b>${META.limiar.toFixed(2).replace('.', ',')}</b>`;
+  const m = META.metricas_teste;
+  $('metricas').innerHTML = [['ROC-AUC', m['ROC-AUC'].toFixed(3)], ['Precisão', pct(m['Precisão'], 0)], ['Recall', pct(m['Recall'], 0)]]
+    .map(([n, v]) => `<div class="metrica"><b>${v.replace('.', ',')}</b><span>${n}</span></div>`).join('');
+}
+
+function limparErros() {
+  $('alerta').className = 'alerta'; $('alerta').innerHTML = '';
+  document.querySelectorAll('.campo').forEach(c => { c.classList.remove('invalido'); c.querySelector('.msg-campo').textContent = ''; });
+}
+function marcarCampo(campo, msg) {
+  const c = document.querySelector(`.campo[data-campo="${campo}"]`);
+  if (c) { c.classList.add('invalido'); c.querySelector('.msg-campo').textContent = msg; }
+}
+function mostrarErros(lista, titulo = 'Não foi possível calcular. Corrija os itens abaixo:') {
+  $('alerta').className = 'alerta erro';
+  $('alerta').innerHTML = `<b>${titulo}</b><ul>${lista.map(e => `<li>${e}</li>`).join('')}</ul>`;
+  $('alerta').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Validação no navegador: campo vazio, texto no lugar de número, valor fora da faixa
+function validar() {
+  const dados = {}, erros = [];
+  for (const campo of Object.keys(ROTULOS)) {
+    const bruto = $(campo).value.trim();
+    if (bruto === '') { erros.push(`${ROTULOS[campo]}: campo obrigatório.`); marcarCampo(campo, 'Obrigatório'); continue; }
+    if (campo in NUMERICOS) {
+      const txt = bruto.replace(',', '.');
+      const ehNumero = NUMERICOS[campo] === 'int' ? /^-?\d+$/.test(txt) : /^-?\d+(\.\d+)?$/.test(txt);
+      if (!ehNumero) {
+        const msg = NUMERICOS[campo] === 'int' ? 'digite um número inteiro (sem letras)' : 'digite um número (sem letras)';
+        erros.push(`${ROTULOS[campo]}: "${bruto}" não é válido, ${msg}.`); marcarCampo(campo, 'Número inválido'); continue;
+      }
+      const v = Number(txt), [lo, hi] = META.faixas[campo];
+      if (v < lo || v > hi) {
+        erros.push(`${ROTULOS[campo]}: ${bruto} está fora da faixa plausível (${lo} a ${hi}).`); marcarCampo(campo, `Entre ${lo} e ${hi}`); continue;
+      }
+      dados[campo] = v;
+    } else dados[campo] = bruto;
+  }
+  return { dados, erros };
+}
+
+async function prever(ev) {
+  ev.preventDefault();
+  limparErros();
+  if (!META) { mostrarErros(['A API não está disponível. Inicie o servidor e recarregue a página.']); return; }
+  const { dados, erros } = validar();
+  if (erros.length) { mostrarErros(erros); return; }
+  const btn = $('btn-prever'); btn.disabled = true; btn.textContent = 'Calculando…';
+  try {
+    const r = await fetch('/api/prever', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) });
+    const corpo = await r.json();
+    if (!r.ok) {
+      // Erros devolvidos pela API (ex.: histórico incoerente)
+      (corpo.detalhes || []).forEach(d => d.campo && marcarCampo(d.campo, 'Verifique'));
+      if (!(corpo.detalhes || []).some(d => d.campo)) ['pdays', 'previous', 'poutcome'].forEach(c => marcarCampo(c, 'Verifique'));
+      mostrarErros((corpo.detalhes || [{ mensagem: 'Erro inesperado na API.' }]).map(d => d.mensagem), 'A API recusou os dados:');
+      return;
+    }
+    exibir(corpo);
+  } catch {
+    mostrarErros(['Falha de comunicação com a API. Verifique se o servidor continua rodando.']);
+  } finally { btn.disabled = false; btn.textContent = 'Calcular propensão'; }
+}
+
+function exibir(res) {
+  $('vazio').style.display = 'none'; $('resultado').style.display = 'block';
+  const alta = res.classe === 1;
+  $('badge').className = 'badge ' + (alta ? 'alta' : 'baixa');
+  $('badge').textContent = alta ? '● ' + res.rotulo : '○ ' + res.rotulo;
+  $('prob').innerHTML = pct(res.probabilidade) + ' <span>de chance</span>';
+  const f = res.faixa_teste;
+  const faixaTxt = f ? ` Nos testes, clientes com chance prevista entre ${pct(f.de, 0)} e ${pct(f.ate, 0)} contrataram ${pct(f.taxa_real)} das vezes (${f.clientes.toLocaleString('pt-BR')} clientes).` : '';
+  $('legenda-prob').textContent = `Probabilidade calibrada de contratar o depósito a prazo: ${res.vezes_taxa_base.toFixed(1).replace('.', ',')}× a taxa média de ${pct(res.taxa_base)}.` + faixaTxt;
+  $('preench').style.width = (res.probabilidade * 100).toFixed(1) + '%';
+  $('preench').style.background = alta ? 'var(--verde)' : 'var(--teal)';
+  $('marca-limiar').style.left = (res.limiar * 100) + '%'; $('txt-limiar').textContent = 'limiar ' + res.limiar.toFixed(2).replace('.', ',');
+  $('marca-base').style.left = (res.taxa_base * 100) + '%'; $('txt-base').textContent = 'média ' + pct(res.taxa_base, 0);
+  $('recomendacao').className = 'recomendacao' + (alta ? ' alta' : '');
+  $('recomendacao').textContent = res.recomendacao;
+  $('detalhes').innerHTML = `Clientes com chance a partir de <b>${pct(res.limiar, 0)}</b> (praticamente a taxa média de adesão) entram na fila prioritária. O limiar foi escolhido no treino pelo <b>F2</b>, que dá peso dobrado a não perder vendas.`;
+  // Em telas estreitas o resultado fica abaixo do formulário: rola até ele
+  if (window.innerWidth <= 980) $('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function preencher(ex) {
+  limparErros();
+  for (const [k, v] of Object.entries(EXEMPLOS[ex])) $(k).value = v;
+}
+
+$('form').addEventListener('submit', prever);
+document.querySelectorAll('[data-exemplo]').forEach(b => b.addEventListener('click', () => preencher(b.dataset.exemplo)));
+$('btn-limpar').addEventListener('click', () => { $('form').reset(); limparErros(); $('resultado').style.display = 'none'; $('vazio').style.display = 'block'; });
+iniciar();
+</script>
+</body>
+</html>

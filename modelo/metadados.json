@@ -1,0 +1,293 @@
+{
+  "projeto": "Bank Marketing: propensão a contratar depósito a prazo",
+  "autor": "Rafael Brasil",
+  "fonte_dados": "UCI Machine Learning Repository, Bank Marketing (id 222), bank-full.csv",
+  "modelo": "XGBClassifier",
+  "hiperparametros": {
+    "learning_rate": 0.1,
+    "max_depth": 3,
+    "n_estimators": 300
+  },
+  "features_numericas": [
+    "age",
+    "balance",
+    "day",
+    "campaign",
+    "pdays",
+    "previous"
+  ],
+  "features_categoricas": [
+    "job",
+    "marital",
+    "education",
+    "default",
+    "housing",
+    "loan",
+    "contact",
+    "month",
+    "poutcome"
+  ],
+  "ordem_features": [
+    "age",
+    "balance",
+    "day",
+    "campaign",
+    "pdays",
+    "previous",
+    "job",
+    "marital",
+    "education",
+    "default",
+    "housing",
+    "loan",
+    "contact",
+    "month",
+    "poutcome"
+  ],
+  "categorias": {
+    "job": [
+      "admin.",
+      "blue-collar",
+      "entrepreneur",
+      "housemaid",
+      "management",
+      "retired",
+      "self-employed",
+      "services",
+      "student",
+      "technician",
+      "unemployed",
+      "unknown"
+    ],
+    "marital": [
+      "divorced",
+      "married",
+      "single"
+    ],
+    "education": [
+      "primary",
+      "secondary",
+      "tertiary",
+      "unknown"
+    ],
+    "default": [
+      "no",
+      "yes"
+    ],
+    "housing": [
+      "no",
+      "yes"
+    ],
+    "loan": [
+      "no",
+      "yes"
+    ],
+    "contact": [
+      "cellular",
+      "telephone",
+      "unknown"
+    ],
+    "month": [
+      "apr",
+      "aug",
+      "dec",
+      "feb",
+      "jan",
+      "jul",
+      "jun",
+      "mar",
+      "may",
+      "nov",
+      "oct",
+      "sep"
+    ],
+    "poutcome": [
+      "failure",
+      "other",
+      "success",
+      "unknown"
+    ]
+  },
+  "faixas_numericas": {
+    "age": [
+      18,
+      100
+    ],
+    "balance": [
+      -20000,
+      200000
+    ],
+    "day": [
+      1,
+      31
+    ],
+    "campaign": [
+      1,
+      100
+    ],
+    "pdays": [
+      -1,
+      999
+    ],
+    "previous": [
+      0,
+      300
+    ]
+  },
+  "calibracao": {
+    "metodo": "Platt: LogisticRegression sobre logit(score do XGBoost), ajustada nas previsões out-of-fold do treino",
+    "coeficiente": 0.9851,
+    "intercepto": -1.9293,
+    "brier_teste": 0.0806,
+    "tabela_teste": [
+      {
+        "faixa": "(-0.001, 0.05]",
+        "clientes": 3103,
+        "prob_media_prevista": 0.0331,
+        "taxa_real": 0.0338
+      },
+      {
+        "faixa": "(0.05, 0.1]",
+        "clientes": 3162,
+        "prob_media_prevista": 0.0709,
+        "taxa_real": 0.0572
+      },
+      {
+        "faixa": "(0.1, 0.2]",
+        "clientes": 1587,
+        "prob_media_prevista": 0.1341,
+        "taxa_real": 0.1298
+      },
+      {
+        "faixa": "(0.2, 0.4]",
+        "clientes": 612,
+        "prob_media_prevista": 0.289,
+        "taxa_real": 0.366
+      },
+      {
+        "faixa": "(0.4, 0.6]",
+        "clientes": 327,
+        "prob_media_prevista": 0.4889,
+        "taxa_real": 0.5107
+      },
+      {
+        "faixa": "(0.6, 1.0]",
+        "clientes": 252,
+        "prob_media_prevista": 0.7357,
+        "taxa_real": 0.6944
+      }
+    ]
+  },
+  "criterio_limiar": "máximo F2 (Recall com peso 2) nas probabilidades calibradas out-of-fold do treino",
+  "limiar": 0.11,
+  "limiar_max_f1": 0.19,
+  "taxa_base_adesao": 0.117,
+  "metricas_teste": {
+    "Acurácia": 0.7757,
+    "Precisão": 0.3006,
+    "Recall": 0.6909,
+    "F1": 0.4189,
+    "F2": 0.5485,
+    "ROC-AUC": 0.8037,
+    "PR-AUC": 0.4644,
+    "% acionados": 0.2689
+  },
+  "metricas_teste_limiar_f1": {
+    "Acurácia": 0.8725,
+    "Precisão": 0.4622,
+    "Recall": 0.5482,
+    "F1": 0.5015,
+    "F2": 0.5285,
+    "ROC-AUC": 0.8037,
+    "PR-AUC": 0.4644,
+    "% acionados": 0.1388
+  },
+  "referencia_sempre_nao": {
+    "Acurácia": 0.883,
+    "Precisão": 0.0,
+    "Recall": 0.0,
+    "F1": 0.0,
+    "F2": 0.0,
+    "ROC-AUC": 0.5,
+    "PR-AUC": 0.117,
+    "% acionados": 0.0
+  },
+  "matriz_confusao_teste": {
+    "VN": 6284,
+    "FP": 1701,
+    "FN": 327,
+    "VP": 731
+  },
+  "validacao_temporal": {
+    "roc_auc": 0.6627,
+    "pr_auc": 0.4674,
+    "taxa_passado": 0.0673,
+    "taxa_futuro": 0.3158,
+    "taxa_por_quinto": [
+      0.0336,
+      0.0562,
+      0.0614,
+      0.1179,
+      0.3159
+    ]
+  },
+  "comparacao_cv": {
+    "XGBoost": {
+      "ROC-AUC": 0.7964,
+      "PR-AUC": 0.448,
+      "F1": 0.45,
+      "Recall": 0.6114,
+      "Precisão": 0.3562,
+      "Acurácia": 0.825,
+      "Desvio ROC-AUC": 0.0025
+    },
+    "Random Forest": {
+      "ROC-AUC": 0.7933,
+      "PR-AUC": 0.4409,
+      "F1": 0.4721,
+      "Recall": 0.5155,
+      "Precisão": 0.4357,
+      "Acurácia": 0.8652,
+      "Desvio ROC-AUC": 0.004
+    },
+    "Regressão Logística": {
+      "ROC-AUC": 0.7637,
+      "PR-AUC": 0.3985,
+      "F1": 0.3726,
+      "Recall": 0.6218,
+      "Precisão": 0.266,
+      "Acurácia": 0.755,
+      "Desvio ROC-AUC": 0.0032
+    },
+    "Dummy (baseline)": {
+      "ROC-AUC": 0.4991,
+      "PR-AUC": 0.1168,
+      "F1": 0.1145,
+      "Recall": 0.1137,
+      "Precisão": 0.1153,
+      "Acurácia": 0.7943,
+      "Desvio ROC-AUC": 0.003
+    }
+  },
+  "grid_search": {
+    "melhor_roc_auc_cv": 0.7996
+  },
+  "curva_ganho": {
+    "10%": 0.4414,
+    "20%": 0.6257,
+    "30%": 0.7212,
+    "50%": 0.8327
+  },
+  "tamanhos": {
+    "total": 45211,
+    "treino": 36168,
+    "teste": 9043
+  },
+  "versoes": {
+    "python_sklearn": "1.9.1",
+    "xgboost": "3.4.1",
+    "pandas": "2.3.3",
+    "numpy": "2.4.1",
+    "joblib": "1.6.0"
+  }
+}
